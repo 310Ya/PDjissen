@@ -48,7 +48,7 @@ data class Quest(
     val point: Int
 )
 // quest list added
-class QuestUI : UI() {
+class QuestUI : questUI() {
     private val _quests = MutableLiveData<List<Quest>>()
     val quests: LiveData<List<Quest>> get() = _quests
     init{
@@ -58,7 +58,7 @@ class QuestUI : UI() {
         )
     }
     fun compQuest(id: Int) {
-        _quests.value = _quest.value?.map {
+        _quests.value = _quests.value?.map {
             if (it.id == id) it.copy(isCompleted = true) else it
         }
     }
