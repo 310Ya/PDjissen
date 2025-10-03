@@ -48,8 +48,8 @@ data class Quest(
     val point: Int
 )
 class QuestUI : UI() {
-    private val_quests = MutableLiveData<List<Quest>>()
-    val quests: LiveData<ListQuest>> get() = _quests
+    private val _quests = MutableLiveData<List<Quest>>()
+    val quests: LiveData<List<Quest>> get() = _quests
     init{
         _quests.value = listOf(
             Quest(1,"今日は4kmを目標にして歩きましょう","4km歩くと4ポイント入手できます。",false,4),
