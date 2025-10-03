@@ -45,7 +45,7 @@ data class Quest(
     private val title: String="クエスト",
     private val description: String,
     private val isCompared: Boolean = false,
-    val reward: Int
+    val point: Int
 )
 class QuestUI : UI() {
     private val_quests = MutableLiveData<List<Quest>>()
