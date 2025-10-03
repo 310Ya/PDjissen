@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.example.pdjissen.databinding.FragmentNotificationsBinding
 
@@ -46,3 +47,18 @@ data class Quest(
     private val isCompared: Boolean = false,
     val reward: Int
 )
+class QuestUI : UI() {
+    private val_quests = MutableLiveData<List<Quest>>()
+    val quests: LiveData<ListQuest>> get() = _quests
+    init{
+        _quests.value = listOf(
+            Quest(1,"今日は4kmを目標にして歩きましょう","4km歩くと4ポイント入手できます。",false,4),
+            Quest(2,"1時間歩きましょう","1時間歩くと2ポイント入手できます。",false,2)
+        )
+    }
+    fun compQuest(id: Int) {
+        _quests.value = _quest.value?.map {
+            if (it.id == id) it.copy(isCompleted = true) else it
+        }
+    }
+}
