@@ -15,7 +15,6 @@ class NotificationsFragment : Fragment() {
 
     // This property is onlyvalid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,3 +39,11 @@ class NotificationsFragment : Fragment() {
         _binding = null
     }
 }
+data class Quest(
+    private val binding get() = _binding!!
+    private val id: Int,
+    private val title: String="クエスト",
+    private val description: String,
+    private val isCompared: Boolean = false,
+    val reward: Int
+)
