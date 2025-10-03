@@ -14,7 +14,7 @@ class NotificationsFragment : Fragment() {
 
     private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!
-    // This property is onlyvalid between onCreateView and
+    // This property is only valid between onCreateView and
     // onDestroyView.
 
     override fun onCreateView(
@@ -47,6 +47,7 @@ data class Quest(
     private val isCompared: Boolean = false,
     val point: Int
 )
+// quest list added
 class QuestUI : UI() {
     private val _quests = MutableLiveData<List<Quest>>()
     val quests: LiveData<List<Quest>> get() = _quests
@@ -62,3 +63,4 @@ class QuestUI : UI() {
         }
     }
 }
+//quest management added
