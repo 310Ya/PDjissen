@@ -12,7 +12,7 @@ import com.example.pdjissen.databinding.FragmentNotificationsBinding
 class NotificationsFragment : Fragment() {
 
     private var _binding: FragmentNotificationsBinding? = null
-
+    private val binding get() = _binding!!
     // This property is onlyvalid between onCreateView and
     // onDestroyView.
 
@@ -40,7 +40,6 @@ class NotificationsFragment : Fragment() {
     }
 }
 data class Quest(
-    private val binding get() = _binding!!
     private val id: Int,
     private val title: String="クエスト",
     private val description: String,
