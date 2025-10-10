@@ -40,3 +40,16 @@ class NotificationsFragment : Fragment() {
         _binding = null
     }
 }
+enum class QuestTypes {
+    DAY,WEEK,EVENT
+}
+data class Quest(
+    val id: Int,
+    val title: String,
+    val description:String,
+    val type: Type,
+    val isCompleted: Boolean=false,
+    val point: Int
+)
+val dayQ = quests.filter { it.type == QuestTypes.DAY }
+val weekQ = quests.filter {it.type == QuestTypes.WEEK }
