@@ -10,8 +10,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
-import androidx.lifecycle.observe
 import com.example.pdjissen.databinding.FragmentNotificationsBinding
 
 class NotificationsFragment : Fragment() {
