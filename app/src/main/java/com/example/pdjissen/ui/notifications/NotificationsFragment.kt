@@ -30,8 +30,8 @@ class NotificationsFragment : Fragment() {
         val root: View = binding.root
 
         val textView: TextView = binding.textNotifications
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        notificationsViewModel.test.observe(viewLifecycleOwner) {
+            textView.test = it
         }
         return root
     }
