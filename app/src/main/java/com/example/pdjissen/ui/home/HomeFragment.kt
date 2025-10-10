@@ -8,14 +8,16 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.navigation.fragment.findNavController
+import com.example.pdjissen.R
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import com.example.pdjissen.R
 
 class HomeFragment : Fragment(), SensorEventListener {
 
@@ -27,6 +29,8 @@ class HomeFragment : Fragment(), SensorEventListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         // XMLで定義したIDを使ってTextViewを見つけるよ
@@ -54,6 +58,8 @@ class HomeFragment : Fragment(), SensorEventListener {
         sensorManager?.unregisterListener(this)
     }
 
+        // ボタンを取得
+        val startButton: Button = view.findViewById(R.id.btnStartMeasure)
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
             val steps = event.values[0].toInt()
@@ -61,6 +67,9 @@ class HomeFragment : Fragment(), SensorEventListener {
         }
     }
 
+        // ボタンを押したらDashboardへ遷移
+        startButton.setOnClickListener {
+            findNavController().navigate(R.id.navigation_dashboard)
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // 何もしない
     }
@@ -77,6 +86,7 @@ class HomeFragment : Fragment(), SensorEventListener {
         }
     }
 
+        return view
     private fun startStepCounter() {
         stepCounterSensor?.let {
             sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
