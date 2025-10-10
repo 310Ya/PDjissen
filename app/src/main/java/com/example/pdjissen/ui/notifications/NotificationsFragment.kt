@@ -47,9 +47,11 @@ data class Quest(
     val id: Int,
     val title: String,
     val description:String,
-    val type: Type,
+    val type: QuestTypes,
     val isCompleted: Boolean=false,
     val point: Int
 )
 val dayQ = quests.filter { it.type == QuestTypes.DAY }
 val weekQ = quests.filter {it.type == QuestTypes.WEEK }
+val eventQ = quests.filter {it.type == QuestTypes.EVENT}
+
