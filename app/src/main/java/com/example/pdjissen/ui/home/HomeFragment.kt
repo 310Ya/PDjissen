@@ -27,6 +27,8 @@ class HomeFragment : Fragment(), SensorEventListener {
     private lateinit var stepCountText: TextView
     private val ACTIVITY_RECOGNITION_REQUEST_CODE = 100
 
+    private var initialSteps: Int = -1
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,11 +74,19 @@ class HomeFragment : Fragment(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-            val steps = event.values[0].toInt()
-            stepCountText.text = "$steps 歩"
+            val totalSteps = event.values[0].toInt()
+
+            // 最初の1回目のイベントだったら、その時の歩数を記録する
+            if (initialSteps == -1) {
+                initialSteps = totalSteps
+            }
+
+            // 現在の合計歩数から、最初の歩数を引いて、アプリ起動後の歩数を計算する
+            val stepsSinceAppStart = totalSteps - initialSteps
+
+            stepCountText.text = "$stepsSinceAppStart 歩"
         }
     }
-
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // 何もしない
     }
