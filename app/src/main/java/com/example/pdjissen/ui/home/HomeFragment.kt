@@ -8,19 +8,20 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.navigation.fragment.findNavController
-import com.example.pdjissen.R
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.pdjissen.R
 
 class HomeFragment : Fragment(), SensorEventListener {
 
+    // 歩数計で使う部品
     private var sensorManager: SensorManager? = null
     private var stepCounterSensor: Sensor? = null
     private lateinit var stepCountText: TextView
@@ -30,16 +31,25 @@ class HomeFragment : Fragment(), SensorEventListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // 1. まず、見た目のファイル（XML）を画面に表示するよ
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-        // XMLで定義したIDを使ってTextViewを見つけるよ
+
+        // 2. 見た目のファイルから、動かしたい部品を探して変数に入れるよ
         stepCountText = view.findViewById(R.id.step_count_text)
+        val startButton: Button = view.findViewById(R.id.btnStartMeasure)
+
+        // 3. GPS計測開始ボタンに、「押されたらDashboard画面に移動してね」って命令するよ
+        startButton.setOnClickListener {
+            findNavController().navigate(R.id.navigation_dashboard)
+        }
+
+        // 4. 準備ができたViewを返すよ
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // 歩数計センサーの準備をするよ
         sensorManager = activity?.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepCounterSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
@@ -47,6 +57,8 @@ class HomeFragment : Fragment(), SensorEventListener {
             Toast.makeText(context, "歩数センサーが見つかりません", Toast.LENGTH_SHORT).show()
         }
     }
+
+    // --- ここから下は、歩数計の機能のためのコードだよ ---
 
     override fun onResume() {
         super.onResume()
@@ -58,8 +70,6 @@ class HomeFragment : Fragment(), SensorEventListener {
         sensorManager?.unregisterListener(this)
     }
 
-        // ボタンを取得
-        val startButton: Button = view.findViewById(R.id.btnStartMeasure)
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
             val steps = event.values[0].toInt()
@@ -67,9 +77,6 @@ class HomeFragment : Fragment(), SensorEventListener {
         }
     }
 
-        // ボタンを押したらDashboardへ遷移
-        startButton.setOnClickListener {
-            findNavController().navigate(R.id.navigation_dashboard)
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // 何もしない
     }
@@ -86,7 +93,6 @@ class HomeFragment : Fragment(), SensorEventListener {
         }
     }
 
-        return view
     private fun startStepCounter() {
         stepCounterSensor?.let {
             sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
