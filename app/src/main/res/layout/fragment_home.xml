@@ -4,22 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@color/white"
     tools:context=".ui.home.HomeFragment">
-
-    <Button
-        android:id="@+id/home_start"
-        style="@style/Widget.AppCompat.Button"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:backgroundTint="#00FFFFFF"
-        android:text="start"
-        android:textIsSelectable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.532"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.669" />
 
     <TextView
         android:id="@+id/text_home"
@@ -55,85 +41,87 @@
         android:id="@+id/home_Quest"
         android:layout_width="150dp"
         android:layout_height="70dp"
+        android:backgroundTint="#F2FF973C"
         android:text="Quest"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.904"
+        app:layout_constraintHorizontal_bias="0.938"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.841" />
+        app:layout_constraintVertical_bias="0.757" />
 
     <Button
         android:id="@+id/home_Friend"
         android:layout_width="150dp"
         android:layout_height="70dp"
+        android:backgroundTint="#F2FF973C"
         android:text="Friend"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.068"
+        app:layout_constraintHorizontal_bias="0.061"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.841" />
+        app:layout_constraintVertical_bias="0.771" />
+
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="276dp"
-        android:layout_height="252dp"
+        android:layout_width="296dp"
+        android:layout_height="305dp"
         android:src="@drawable/_2025_10_10_141630"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.402" />
+        app:layout_constraintVertical_bias="0.248" />
 
     <Button
         android:id="@+id/home_Ranking"
         android:layout_width="100dp"
         android:layout_height="60dp"
+        android:backgroundTint="#F2FF973C"
         android:text="Ranking"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.218"
+        app:layout_constraintHorizontal_bias="0.131"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.162" />
+        app:layout_constraintVertical_bias="0.895" />
 
     <Button
         android:id="@+id/home_Status"
         android:layout_width="100dp"
         android:layout_height="60dp"
+        android:backgroundTint="#F2FF973C"
         android:text="Status"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.791"
+        app:layout_constraintHorizontal_bias="0.89"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.163" />
-
-    <TextView
-        android:id="@+id/step_count_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0 歩"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintVertical_bias="0.895" />
 
 
     <Button
         android:id="@+id/btnStartMeasure"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
-        android:text="GPS計測開始"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@drawable/round_button"
+        android:text="START"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:elevation="10dp"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintVertical_bias="0.5"
+        android:layout_marginTop="16dp" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
