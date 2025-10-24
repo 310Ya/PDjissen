@@ -2,15 +2,50 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/textLocation"
+        android:id="@+id/textDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="位置情報がここに表示されます"
-        android:textSize="16sp" />
+        android:text="移動距離: 0.0 m"
+        android:textSize="18sp"
+        android:padding="4dp" />
+
+    <TextView
+        android:id="@+id/textSteps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="歩数: 0"
+        android:textSize="18sp"
+        android:padding="4dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnStartMeasure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="計測開始" />
+
+        <Button
+            android:id="@+id/btnStopMeasure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="計測終了"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>
+
