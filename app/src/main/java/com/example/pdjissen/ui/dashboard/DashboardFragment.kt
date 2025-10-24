@@ -115,7 +115,7 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
         // 位置情報リクエストの設定
         locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_BALANCED_POWER_ACCURACY, // 精度を「バランス型」に変更
-            TimeUnit.SECONDS.toMillis(5) // 5秒ごとに更新
+            TimeUnit.SECONDS.toMillis(1) // 5秒ごとに更新
         )
             .setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(5)) // 最短更新間隔も5秒に設定
             .build()
