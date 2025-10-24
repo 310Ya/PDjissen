@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.btnStart.setOnClickListener {
             totalDistance = 0f
             lastLocation = null
+            // UIをリセット
+            binding.textDistance.text = String.format("移動距離: %.2f m", totalDistance)
             isTracking = true
             startLocationUpdates()
         }
@@ -88,13 +90,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
+        // LocationRequestの優先度をPRIORITY_HIGH_ACCURACYに設定し、更新間隔を2秒に設定
         val locationRequest = LocationRequest.Builder(2000)
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
             .build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                for (location in locationResult.locations) {
+                // onLocationResultは複数の位置情報を返すことがあるため、最新の位置情報を使う
+                locationResult.lastLocation?.let { location ->
                     updateLocation(location)
                 }
             }
@@ -102,7 +106,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
     }
 
+    // --- ここからが修正された関数です ---
     private fun updateLocation(location: Location) {
+        // ========== 修正点 1: 精度の低い位置情報を無視 ==========
+        // 精度が20メートルより悪い場合は、処理を行わない
+        if (location.accuracy > 20.0f) {
+            return
+        }
+
         val currentLatLng = LatLng(location.latitude, location.longitude)
 
         // カメラを移動
@@ -113,24 +124,41 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.addMarker(MarkerOptions().position(currentLatLng).title("現在地"))
 
         // 距離計測
-        if (isTracking && lastLocation != null) {
-            totalDistance += lastLocation!!.distanceTo(location)
-            binding.textDistance.text = String.format("移動距離: %.2f m", totalDistance)
-        }
+        if (isTracking) {
+            // 最初の位置情報の場合は、lastLocationに設定して処理を終える
+            if (lastLocation == null) {
+                lastLocation = location
+                return
+            }
 
-        lastLocation = location
+            // 2点間の距離を計算
+            val distance = lastLocation!!.distanceTo(location)
+
+            // ========== 修正点 2: 静止時のブレ（小さな移動）を無視 ==========
+            // 例えば2メートル以上の移動があった場合のみ距離を加算する
+            if (distance > 1.0f) {
+                totalDistance += distance
+                binding.textDistance.text = String.format("移動距離: %.2f m", totalDistance)
+            }
+
+            // 最後の位置情報を更新
+            lastLocation = location
+        }
     }
+    // --- ここまでが修正された関数です ---
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE &&
-            grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
-            enableMyLocation()
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults) // superの呼び出しを追加
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 権限が許可された場合
+                enableMyLocation()
+            }
         }
     }
 }
