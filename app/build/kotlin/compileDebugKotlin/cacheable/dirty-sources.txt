@@ -1,0 +1,7 @@
+C:\Users\cheha\AndroidStudioProjects\PDjissen\app\src\main\java\com\example\pdjissen\ui\dashboard\DashboardFragment.kt
+C:\Users\cheha\AndroidStudioProjects\PDjissen\app\src\main\java\com\example\pdjissen\ui\notifications\NotificationsFragment.kt
+C:\Users\cheha\AndroidStudioProjects\PDjissen\app\src\main\java\com\example\pdjissen\MainActivity.kt
+C:\Users\cheha\AndroidStudioProjects\PDjissen\app\src\main\java\com\example\pdjissen\ui\notifications\NotificationsViewModel.kt
+C:\Users\cheha\AndroidStudioProjects\PDjissen\app\src\main\java\com\example\pdjissen\ui\home\HomeFragment.kt
+C:\Users\cheha\AndroidStudioProjects\PDjissen\app\src\main\java\com\example\pdjissen\ui\dashboard\DashboardViewModel.kt
+C:\Users\cheha\AndroidStudioProjects\PDjissen\app\src\main\java\com\example\pdjissen\ui\home\HomeViewModel.kt

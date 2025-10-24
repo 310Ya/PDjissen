@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.example.pdjissen.app-mergeDebugResources-50:/layout/fragment_notifications.xml",
+        "source": "com.example.pdjissen.app-main-53:/layout/fragment_notifications.xml"
+    },
+    {
+        "merged": "com.example.pdjissen.app-mergeDebugResources-50:/layout/fragment_dashboard.xml",
+        "source": "com.example.pdjissen.app-main-53:/layout/fragment_dashboard.xml"
+    },
+    {
+        "merged": "com.example.pdjissen.app-mergeDebugResources-50:/layout/activity_main.xml",
+        "source": "com.example.pdjissen.app-main-53:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.pdjissen.app-mergeDebugResources-50:/layout/fragment_home.xml",
+        "source": "com.example.pdjissen.app-main-53:/layout/fragment_home.xml"
+    }
+]
