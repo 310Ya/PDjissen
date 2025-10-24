@@ -11,6 +11,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.pdjissen.databinding.FragmentNotificationsBinding
+// NotificationsViewModelをインポートするために追加
+import com.example.pdjissen.ui.notifications.NotificationsViewModel
 
 class NotificationsFragment : Fragment() {
 
@@ -30,6 +32,10 @@ class NotificationsFragment : Fragment() {
         val root: View = binding.root
 
         val textView: TextView = binding.textNotifications
+
+        notificationsViewModel.text.observe(viewLifecycleOwner) { newText ->
+            textView.text = newText
+        }
 
         return root
     }
