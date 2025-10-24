@@ -63,11 +63,13 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                 // 位置情報の権限が許可された！
-                startLocationUpdatesWithCheck() // 位置情報取得を開始
+                // startLocationUpdatesWithCheck() // すぐに計測は開始しない
+                enableMyLocationOnMap() // マップの現在地表示を有効にする
             }
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                // 大まかな位置情報の権限だけ許可された場合 (必要なら処理)
-                startLocationUpdatesWithCheck()
+                // 大まかな位置情報の権限だけ許可された場合
+                // startLocationUpdatesWithCheck()
+                enableMyLocationOnMap()
             } else -> {
             // 位置情報の権限が拒否された...
             Toast.makeText(context, "位置情報の権限がないと地図機能は使えません", Toast.LENGTH_SHORT).show()
@@ -79,6 +81,8 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
     ) { isGranted: Boolean ->
         if (isGranted) {
             // 歩数計の権限が許可された！
+            // 権限チェックフローの最後なので、両方スタート！
+            startLocationUpdatesWithCheck() // GPSもスタート
             startStepCounter() // 歩数計を開始
         } else {
             // 歩数計の権限が拒否された...
@@ -149,12 +153,29 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
     // 地図の準備ができたら呼ばれる (MainActivityから持ってきた！)
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
-        // 必要であれば初期位置などを設定
-        // 例: val tokyo = LatLng(35.68, 139.76)
-        // googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(tokyo, 15f))
 
-        // もしすでに計測が始まっていたら、現在地を表示
-        if (isTracking) {
+        // まず、位置情報の権限がすでにあるか確認する
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // 権限がある！ -> 新しい関数を呼ぶ
+            enableMyLocationOnMap()
+
+        } else {
+            // 権限がまだない... -> 権限をリクエストする！
+            locationPermissionRequest.launch(arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ))
+        }
+    }
+    @SuppressLint("MissingPermission") // 呼び出し元で権限チェックしてる前提
+    private fun enableMyLocationOnMap() {
+        // googleMapがnullじゃない（onMapReadyが呼ばれた後）か確認
+        if (googleMap != null) {
+            // 1. マップに「現在地ボタン（青い丸）」を有効にする
+            googleMap?.isMyLocationEnabled = true
+            googleMap?.uiSettings?.isMyLocationButtonEnabled = true // 右上の「現在地に戻る」ボタン
+
+            // 2. 最後に取得した現在地（LastLocation）にカメラを移動する
             getLastLocationAndMoveCamera()
         }
     }
