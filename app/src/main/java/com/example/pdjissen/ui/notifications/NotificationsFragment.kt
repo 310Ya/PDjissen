@@ -11,9 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.pdjissen.databinding.FragmentNotificationsBinding
-// NotificationsViewModelをインポートするために追加
 import com.example.pdjissen.ui.notifications.NotificationsViewModel
-
 class NotificationsFragment : Fragment() {
 
     private var _binding: FragmentNotificationsBinding? = null
@@ -66,7 +64,6 @@ class QuestUI : ViewModel() {
     }
 
     fun compQuest(id: Int) {
-        // The '.value?' ensures this runs only if the LiveData has a value.
         _quests.value = _quests.value?.map { quest ->
             if (quest.id == id) {
                 quest.copy(isCompleted = true)
