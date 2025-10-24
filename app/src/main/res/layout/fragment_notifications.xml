@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.notifications.NotificationsFragment">
 
-    <!-- クエストの説明を表示するTextView -->
     <TextView
         android:id="@+id/text_quest_title"
         android:layout_width="wrap_content"
@@ -32,7 +31,6 @@
         app:layout_constraintTop_toBottomOf="@id/text_quest_title"
         tools:text="キャラクターをタップしてアイテムをゲットしよう！" />
 
-    <!-- キャラクター画像 -->
     <ImageView
         android:id="@+id/image_character"
         android:layout_width="120dp"
@@ -45,7 +43,6 @@
         app:layout_constraintVertical_bias="0.6"
         android:contentDescription="キャラクター"/>
 
-    <!-- アイテム画像 -->
     <ImageView
         android:id="@+id/image_item"
         android:layout_width="60dp"
@@ -65,7 +62,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- ジャンプボタン -->
     <Button
         android:id="@+id/jump_button"
         android:layout_width="wrap_content"
