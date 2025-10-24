@@ -6,17 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".ui.notifications.NotificationsFragment">
 
-    <!-- このTextViewをレイアウトの中に入れます -->
-    <!-- このIDがFragment側の binding.textNotifications に対応します -->
     <TextView
-        android:id="@+id/text_notifications"
+        android:id="@+id/text_quest_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loading..."
+        android:layout_marginTop="32dp"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="クエスト" />
+
+    <TextView
+        android:id="@+id/text_quest_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_quest_title"
+        tools:text="キャラクターをタップしてアイテムをゲットしよう！" />
+
+    <ImageView
+        android:id="@+id/image_character"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:contentDescription="キャラクター"
+        android:src="android.R.drawable.ic_menu_phone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.545" />
+
+    <ImageView
+        android:id="@+id/image_item"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="android.R.drawable.ic_menu_camera"
+        app:layout_constraintBottom_toTopOf="@id/image_character"
+        app:layout_constraintEnd_toEndOf="@id/image_character"
+        app:layout_constraintStart_toStartOf="@id/image_character"
+        android:contentDescription="@string/bottom_sheet_behavior"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
