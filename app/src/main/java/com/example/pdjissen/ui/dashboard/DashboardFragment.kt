@@ -1,3 +1,4 @@
+//GPS関係
 package com.example.pdjissen.ui.dashboard
 
 import android.Manifest
@@ -47,9 +48,8 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     private var pedometerManager: PedometerManager? = null // 歩数計の専門家を呼ぶよ！
 
     // --- GPS関連 (MainActivityから持ってきた！) ---
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var locationCallback: LocationCallback
-    private lateinit var locationRequest: LocationRequest
+    // ★ ここはごっそり書き換えるよ！ ★
+    private var locationTracker: LocationTracker? = null // GPSの専門家を呼ぶよ！
     private var lastLocation: Location? = null
     private var totalDistance = 0f
     private var isTracking = false // 計測中かどうか
@@ -61,12 +61,10 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                 // 位置情報の権限が許可された！
-                // startLocationUpdatesWithCheck() // すぐに計測は開始しない
-                enableMyLocationOnMap() // マップの現在地表示を有効にする
+                enableMyLocationOnMap()
             }
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                 // 大まかな位置情報の権限だけ許可された場合
-                // startLocationUpdatesWithCheck()
                 enableMyLocationOnMap()
             } else -> {
             // 位置情報の権限が拒否された...
@@ -80,7 +78,7 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         if (isGranted) {
             // 歩数計の権限が許可された！
             // 権限チェックフローの最後なので、両方スタート！
-            startLocationUpdatesWithCheck() // GPSもスタート
+            locationTracker?.start()// GPSもスタート
             pedometerManager?.start() // 歩数計を開始
         } else {
             // 歩数計の権限が拒否された...
@@ -108,24 +106,11 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         // GPSクライアントの準備 (MainActivityから持ってきた！)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
-        // 位置情報リクエストの設定
-        locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_BALANCED_POWER_ACCURACY, // 精度を「バランス型」に変更
-            TimeUnit.SECONDS.toMillis(1) // 5秒ごとに更新
-        )
-            .setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(5)) // 最短更新間隔も5秒に設定
-            .build()
-
-        // 位置情報を受け取ったときの処理 (MainActivityから持ってきた！)
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                locationResult.lastLocation?.let { location ->
-                    updateLocationUI(location)
-                }
-            }
+        locationTracker = LocationTracker(requireContext()) { location ->
+            // ↑ 新しい位置情報が来たら、ここに連絡が来る！
+            updateLocationUI(location) // 前からある地図更新の処理を呼ぶ
         }
+
 
         // 歩数計センサーの準備
         pedometerManager = PedometerManager(requireContext()) { stepsSinceStart ->
@@ -197,9 +182,9 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     private fun stopTracking() {
         if (isTracking) {
             isTracking = false
-            stopLocationUpdates() // 位置情報更新を停止
-            // ★ 歩数計を停止（専門家にお願いする） ★
-            pedometerManager?.stop() // 修正
+            // ★ 位置情報更新を停止（専門家にお願いする） ★
+            locationTracker?.stop() // 修正
+            pedometerManager?.stop()
             Toast.makeText(context, "計測を終了しました", Toast.LENGTH_SHORT).show()
         }
     }
@@ -224,9 +209,9 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     private fun checkActivityRecognitionPermissionAndStartStepCounter() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             // 歩数計OK -> 両方の権限がOKなので、両方スタート！
-            startLocationUpdatesWithCheck()
-            // ★ 歩数計を開始（専門家にお願いする） ★
-            pedometerManager?.start() // 修正 (startStepCounter() ではなく)
+            // ★ 位置情報も開始（専門家にお願いする） ★
+            locationTracker?.start() // 修正 (startLocationUpdatesWithCheck() ではなく)
+            pedometerManager?.start()
         } else {
             // 歩数計の権限がない -> リクエスト
             activityRecognitionPermissionRequest.launch(Manifest.permission.ACTIVITY_RECOGNITION)
@@ -235,17 +220,14 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
 
 
     // --- 位置情報関連 (MainActivityから持ってきた！) ---
-    @SuppressLint("MissingPermission") // 権限チェックは呼び出し元で行う
-    private fun startLocationUpdatesWithCheck() {
-        // すでに権限があるはずなので、最後の現在地を取得してカメラ移動
-        getLastLocationAndMoveCamera()
-        // 位置情報の更新を開始
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
-    }
+    //@SuppressLint("MissingPermission") // 権限チェックは呼び出し元で行う
+
 
     @SuppressLint("MissingPermission")
     private fun getLastLocationAndMoveCamera() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        // 専門家（LocationTracker）に「最後の場所ちょうだい！」ってお願いする
+        locationTracker?.getLastKnownLocation { location: Location? ->
+            // 「場所、見つかったよ！（または null だったよ！）」って連絡がここに来る
             location?.let {
                 val currentLatLng = LatLng(it.latitude, it.longitude)
                 googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f))
@@ -256,9 +238,6 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
 
     // 新しい位置情報でUIを更新 (MainActivityから持ってきた！)
     private fun updateLocationUI(location: Location) {
@@ -270,7 +249,7 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f)) // 最初の位置にカメラ移動
         } else {
             currentMarker?.position = currentLatLng
-            googleMap?.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng)) // カメラをスムーズに移動
+            googleMap?.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng)) //
         }
 
 
@@ -298,7 +277,7 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         super.onPause()
         mapView.onPause()
         // バッテリー節約のため、センサーと位置情報の取得を止める
-        stopLocationUpdates()
+        locationTracker?.stop()
         // ★ 歩数計を停止（専門家にお願いする） ★
         pedometerManager?.stop() // 修正
     }
