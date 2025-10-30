@@ -32,7 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import java.util.concurrent.TimeUnit
 
 // SensorEventListener と OnMapReadyCallback の両方を実装するよ！
-class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
+class DashboardFragment : Fragment(), OnMapReadyCallback {
 
     // --- 見た目の部品 ---
     private lateinit var textDistance: TextView
@@ -44,9 +44,7 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
     private var currentMarker: Marker? = null
 
     // --- 歩数計関連 ---
-    private var sensorManager: SensorManager? = null
-    private var stepCounterSensor: Sensor? = null
-    private var initialSteps: Int = -1 // アプリ起動後の歩数計算用
+    private var pedometerManager: PedometerManager? = null // 歩数計の専門家を呼ぶよ！
 
     // --- GPS関連 (MainActivityから持ってきた！) ---
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -83,7 +81,7 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
             // 歩数計の権限が許可された！
             // 権限チェックフローの最後なので、両方スタート！
             startLocationUpdatesWithCheck() // GPSもスタート
-            startStepCounter() // 歩数計を開始
+            pedometerManager?.start() // 歩数計を開始
         } else {
             // 歩数計の権限が拒否された...
             Toast.makeText(context, "身体活動の権限がないと歩数計機能は使えません", Toast.LENGTH_SHORT).show()
@@ -130,10 +128,9 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
         }
 
         // 歩数計センサーの準備
-        sensorManager = context?.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepCounterSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        if (stepCounterSensor == null) {
-            Toast.makeText(context, "歩数センサーが見つかりません", Toast.LENGTH_SHORT).show()
+        pedometerManager = PedometerManager(requireContext()) { stepsSinceStart ->
+            // ↑ 歩数を数えたら、ここに連絡が来る！
+            stepCountText.text = "歩数: $stepsSinceStart 歩"
         }
 
         // 計測開始ボタンの処理
@@ -181,20 +178,6 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
     }
 
     // --- SensorEventListener ---
-    // 歩数が変わったら呼ばれる
-    override fun onSensorChanged(event: SensorEvent?) {
-        if (!isTracking) return // 計測中でなければ何もしない
-        if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-            val totalSteps = event.values[0].toInt()
-            if (initialSteps == -1) {
-                initialSteps = totalSteps
-            }
-            val stepsSinceStart = totalSteps - initialSteps
-            stepCountText.text = "歩数: $stepsSinceStart 歩"
-        }
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { /* 使わない */ }
 
     // --- 計測開始・終了ロジック ---
     private fun startTracking() {
@@ -202,7 +185,6 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
             isTracking = true
             totalDistance = 0f // 距離リセット
             lastLocation = null // 前回の位置リセット
-            initialSteps = -1 // 歩数計の初期値リセット
             textDistance.text = "移動距離: 0.0 m"
             stepCountText.text = "歩数: 0 歩" // 表示もリセット
 
@@ -216,7 +198,8 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
         if (isTracking) {
             isTracking = false
             stopLocationUpdates() // 位置情報更新を停止
-            stopStepCounter() // 歩数計を停止
+            // ★ 歩数計を停止（専門家にお願いする） ★
+            pedometerManager?.stop() // 修正
             Toast.makeText(context, "計測を終了しました", Toast.LENGTH_SHORT).show()
         }
     }
@@ -242,7 +225,8 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             // 歩数計OK -> 両方の権限がOKなので、両方スタート！
             startLocationUpdatesWithCheck()
-            startStepCounter()
+            // ★ 歩数計を開始（専門家にお願いする） ★
+            pedometerManager?.start() // 修正 (startStepCounter() ではなく)
         } else {
             // 歩数計の権限がない -> リクエスト
             activityRecognitionPermissionRequest.launch(Manifest.permission.ACTIVITY_RECOGNITION)
@@ -298,16 +282,6 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
         lastLocation = location // 今回の位置を次回のために覚えておく
     }
 
-    // --- 歩数計関連 ---
-    private fun startStepCounter() {
-        stepCounterSensor?.let {
-            sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
-        }
-    }
-
-    private fun stopStepCounter() {
-        sensorManager?.unregisterListener(this, stepCounterSensor)
-    }
 
     // --- MapViewのライフサイクル管理 ---
     // これらをちゃんと呼んであげないと地図がうまく動かないよ！
@@ -325,7 +299,8 @@ class DashboardFragment : Fragment(), SensorEventListener, OnMapReadyCallback {
         mapView.onPause()
         // バッテリー節約のため、センサーと位置情報の取得を止める
         stopLocationUpdates()
-        stopStepCounter()
+        // ★ 歩数計を停止（専門家にお願いする） ★
+        pedometerManager?.stop() // 修正
     }
 
     override fun onDestroyView() {
