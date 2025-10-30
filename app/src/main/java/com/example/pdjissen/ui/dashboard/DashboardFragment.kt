@@ -41,8 +41,8 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     private lateinit var btnStart: Button
     private lateinit var btnStop: Button
     private lateinit var mapView: MapView
-    private var googleMap: GoogleMap? = null
-    private var currentMarker: Marker? = null
+    //private var googleMap: GoogleMap? = null
+    //private var currentMarker: Marker? = null
 
     // --- 歩数計関連 ---
     private var pedometerManager: PedometerManager? = null // 歩数計の専門家を呼ぶよ！
@@ -50,6 +50,8 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     // --- GPS関連 (MainActivityから持ってきた！) ---
     // ★ ここはごっそり書き換えるよ！ ★
     private var locationTracker: LocationTracker? = null // GPSの専門家を呼ぶよ！
+    // ★ 地図の専門家を呼ぶよ！ ★
+    private var mapManager: MapManager? = null
     private var lastLocation: Location? = null
     private var totalDistance = 0f
     private var isTracking = false // 計測中かどうか
@@ -104,6 +106,8 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         // 地図の準備ができたら教えてもらうように設定
         mapView.getMapAsync(this)
+        // ★ MapManagerを準備する ★
+        mapManager = MapManager(requireContext())
 
         // GPSクライアントの準備 (MainActivityから持ってきた！)
         locationTracker = LocationTracker(requireContext()) { location ->
@@ -134,13 +138,13 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     // --- OnMapReadyCallback ---
     // 地図の準備ができたら呼ばれる (MainActivityから持ってきた！)
     override fun onMapReady(map: GoogleMap) {
-        googleMap = map
+        // ★ 専門家（MapManager）に地図を渡す ★
+        mapManager?.setupMap(map)
 
         // まず、位置情報の権限がすでにあるか確認する
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // 権限がある！ -> 新しい関数を呼ぶ
+            // 権限がある！ -> 専門家に「現在地表示して！」ってお願い
             enableMyLocationOnMap()
-
         } else {
             // 権限がまだない... -> 権限をリクエストする！
             locationPermissionRequest.launch(arrayOf(
@@ -151,15 +155,11 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     }
     @SuppressLint("MissingPermission") // 呼び出し元で権限チェックしてる前提
     private fun enableMyLocationOnMap() {
-        // googleMapがnullじゃない（onMapReadyが呼ばれた後）か確認
-        if (googleMap != null) {
-            // 1. マップに「現在地ボタン（青い丸）」を有効にする
-            googleMap?.isMyLocationEnabled = true
-            googleMap?.uiSettings?.isMyLocationButtonEnabled = true // 右上の「現在地に戻る」ボタン
+        // ★ 専門家にお願いする ★
+        mapManager?.enableMyLocation()
 
-            // 2. 最後に取得した現在地（LastLocation）にカメラを移動する
-            getLastLocationAndMoveCamera()
-        }
+        // 最後に取得した現在地（LastLocation）にカメラを移動する
+        getLastLocationAndMoveCamera()
     }
 
     // --- SensorEventListener ---
@@ -225,15 +225,12 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun getLastLocationAndMoveCamera() {
-        // 専門家（LocationTracker）に「最後の場所ちょうだい！」ってお願いする
         locationTracker?.getLastKnownLocation { location: Location? ->
-            // 「場所、見つかったよ！（または null だったよ！）」って連絡がここに来る
             location?.let {
                 val currentLatLng = LatLng(it.latitude, it.longitude)
-                googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f))
-                // マーカーも更新
-                currentMarker?.remove() // 古いマーカーを消す
-                currentMarker = googleMap?.addMarker(MarkerOptions().position(currentLatLng).title("現在地"))
+                // ★ 専門家にお願いする ★
+                mapManager?.moveCameraTo(currentLatLng)
+                mapManager?.updateMarker(currentLatLng)
             }
         }
     }
@@ -243,15 +240,15 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     private fun updateLocationUI(location: Location) {
         val currentLatLng = LatLng(location.latitude, location.longitude)
 
-        // マーカーを更新
-        if (currentMarker == null && googleMap != null) {
-            currentMarker = googleMap?.addMarker(MarkerOptions().position(currentLatLng).title("現在地"))
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f)) // 最初の位置にカメラ移動
+        // ★ 専門家にお願いする ★
+        mapManager?.updateMarker(currentLatLng)
+        // 最初の位置にカメラ移動（計測開始時のみ）
+        if (!isTracking) {
+            mapManager?.moveCameraTo(currentLatLng)
         } else {
-            currentMarker?.position = currentLatLng
-            googleMap?.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng)) //
+            // 計測中はカメラをスムーズに移動
+            mapManager?.animateCameraTo(currentLatLng)
         }
-
 
         // 距離計測 (計測中の場合のみ)
         if (isTracking && lastLocation != null) {
@@ -285,8 +282,8 @@ class DashboardFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroyView() {
         super.onDestroyView()
         mapView.onDestroy()
-        googleMap = null // 地図オブジェクトを解放
-        currentMarker = null
+        mapManager?.cleanup()
+        mapManager = null
     }
 
     override fun onLowMemory() {
