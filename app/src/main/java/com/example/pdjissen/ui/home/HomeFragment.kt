@@ -28,18 +28,23 @@ class HomeFragment : Fragment() {
         val statusButton: Button = view.findViewById(R.id.home_Status) // 追加されたボタン
         val editText: EditText = view.findViewById(R.id.editTextText) // 追加されたEditText
         val textView: TextView = view.findViewById(R.id.text_home) // ようこそ！のTextView
+        val friendButton: Button = view.findViewById(R.id.home_Friend) // Friendボタン
+        val questButton: Button = view.findViewById(R.id.home_Quest)   // Questボタン
+        val rankingButton: Button = view.findViewById(R.id.home_Ranking) // Rankingボタン
 
-        // 3. 「START」ボタンに、「押されたらDashboard画面に移動してね」って命令するよ
+        // 3.
         startButton.setOnClickListener {
             findNavController().navigate(R.id.navigation_dashboard)
         }
-
-        // --- ここに、新しく追加されたボタン（home_Next, home_Status）や ---
-        // --- EditText（editTextText）が押されたり、入力されたりした時の ---
-        // --- 処理をこれから追加していくことになるよ！ ---
-        // 例：
-        // nextButton.setOnClickListener { /* 何か処理 */ }
-        // statusButton.setOnClickListener { /* 何か処理 */ }
+        friendButton.setOnClickListener {
+            findNavController().navigate(R.id.navigation_friend)
+        }
+        questButton.setOnClickListener {
+            findNavController().navigate(R.id.navigation_quest)
+        }
+        rankingButton.setOnClickListener {
+            findNavController().navigate(R.id.navigation_ranking)
+        }
 
 
         // 4. 準備ができたViewを返すよ
